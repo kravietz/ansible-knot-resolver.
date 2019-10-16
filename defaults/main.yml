@@ -1,0 +1,22 @@
+---
+knot_resolver_user: knot-resolver
+knot_resolver_group: knot-resolver
+
+# knot_resolver_interfaces:
+# - '53'
+# knot_tls_interface: '853'
+
+#knot_resolver_cert:
+#knot_resolver_key:
+#knot_resolver_cert_dir: /etc/letsencrypt
+
+knot_resolver_cache_size: 100 # MB
+knot_resolver_modules:
+  - "hints > iterate" # Load /etc/hosts and allow custom root hints
+  - "stats" # Track internal statistics
+  - "predict" # Prefetch expiring/frequent records
+  - "bogus_log" # DNSSEC validation failure logging
+  - "workarounds < iterate" # workarounds for specific broken sub-domains
+  - "rebinding < iterate" # Rebinding protection
+  - "experimental_dot_auth" # Experimental DNS-over-TLS Auto-discovery
+knot_resolver_disable_dnssec: no

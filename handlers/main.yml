@@ -1,0 +1,13 @@
+---
+- name: apparmor
+  command: /sbin/apparmor_parser -r -W /etc/apparmor.d/usr.sbin.kresd
+
+- name: systemd reload
+  systemd:
+    daemon_reload: yes
+
+- name: kresd restart
+  service:
+    name: kresd@1
+    state: restarted
+    enabled: yes

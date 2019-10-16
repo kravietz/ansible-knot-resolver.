@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+
+[Socket]
+ListenDatagram=
+ListenStream=
+
+{% for iface in knot_resolver_interfaces %}
+ListenDatagram={{ iface }}
+ListenStream={{ iface }}
+{% endfor %}

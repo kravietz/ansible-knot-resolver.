@@ -1,0 +1,84 @@
+---
+- name: knot-resolver group
+  group:
+    name: "{{ knot_resolver_group }}"
+- name: knot-resolver user
+  user:
+    name: "{{ knot_resolver_user }}"
+    group: "{{ knot_resolver_group }}"
+    home: /var/cache/knot-resolver
+    password_lock: yes
+
+- name: AppArmor profile
+  template:
+    src: templates/apparmor.conf.j2
+    dest: /etc/apparmor.d/usr.sbin.kresd
+    validate: '/sbin/apparmor_parser -d %s'
+  notify:
+  - apparmor
+
+- name: install knot official repository
+  apt:
+    deb: https://secure.nic.cz/files/knot-resolver/knot-resolver-release.deb
+
+- name: supporting lua libraries
+  apt:
+    name: '{{ item }}'
+  loop: ['lua-basexx', 'lua-cqueues', 'lua-psl']
+
+- name: install knot-resolver package
+  apt:
+    name: knot-resolver
+
+- name: kresd configuration
+  template:
+    src: templates/kresd.conf.j2
+    dest: /etc/knot-resolver/kresd.conf
+  notify:
+  - systemd reload
+  - kresd restart
+
+- name: kresd service override directory
+  file:
+    dest: /etc/systemd/system/kresd@1.service.d
+    state: directory
+  when: knot_resolver_cert is defined or knot_resolver_key is defined
+
+- name: kresd socket configuration
+  template:
+    src: templates/service.override.conf.j2
+    dest: /etc/systemd/system/kresd@1.service.d/override.conf
+  when: knot_resolver_interfaces is defined
+  notify:
+  - systemd reload
+  - kresd restart
+
+- name: kresd socket-tls override directory
+  file:
+    dest: /etc/systemd/system/kresd-tls.socket.d
+    state: directory
+  when: knot_resolver_cert is defined or knot_resolver_key is defined
+
+- name: kresd socket-tls configuration
+  template:
+    src: templates/socket-tls.override.conf.j2
+    dest: /etc/systemd/system/kresd-tls.socket.d/override.conf
+  when: knot_resolver_interfaces is defined
+  notify:
+  - systemd reload
+  - kresd restart
+
+- name: systemd override directory
+  file:
+    dest: /etc/systemd/system/kresd.socket.d
+    state: directory
+  when: knot_resolver_interfaces is defined
+
+- name: kresd socket configuration
+  template:
+    src: templates/socket.override.conf.j2
+    dest: /etc/systemd/system/kresd.socket.d/override.conf
+  when: knot_resolver_interfaces is defined
+  notify:
+  - systemd reload
+  - kresd restart
