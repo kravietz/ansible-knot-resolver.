@@ -1,7 +1,7 @@
-# Last Modified: Tue Oct 15 21:11:38 2019
+# Last Modified: Thu Oct 17 21:44:53 2019
 #include <tunables/global>
 
-/usr/sbin/kresd flags=(complain) {
+/usr/sbin/kresd {
   #include <abstractions/base>
   #include <abstractions/nameservice>
   #include <abstractions/openssl>
@@ -14,25 +14,27 @@
 
   network,
 
-{% if knot_resolver_cert is defined %}
-  {{ knot_resolver_cert }} r,
-{% endif %}
-{% if knot_resolver_key is defined %}
-  {{ knot_resolver_key }} r,
-{% endif %}
-{% if knot_resolver_cert_dir is defined %}
-  {{ knot_resolver_cert_dir }} rix,
-{% endif %}
+  {% if knot_resolver_cert is defined %}
+    {{ knot_resolver_cert }} r,
+  {% endif %}
+  {% if knot_resolver_key is defined %}
+    {{ knot_resolver_key }} r,
+  {% endif %}
+  {% if knot_resolver_cert_dir is defined %}
+    {{ knot_resolver_cert_dir }} rix,
+  {% endif %}
 
-  /run/knot-resolver rw,
   /etc/knot-resolver/* r,
+  /etc/letsencrypt/** rix,
   /lib/x86_64-linux-gnu/ld-*.so mr,
+  /run/knot-resolver/* rw,
   /run/systemd/notify w,
   /usr/lib/knot-resolver/** mr,
   /usr/lib/knot-resolver/kres_modules/* mr,
   /usr/sbin/kresd mr,
   /usr/share/dns/* r,
   /usr/share/lua/** r,
+  owner /etc/knot-resolver/lock.mdb rw,
   owner /usr/lib/knot-resolver/* mr,
   owner /var/cache/knot-resolver/* rwk,
 
