@@ -83,3 +83,9 @@
   notify:
   - systemd reload
   - kresd restart
+
+- name: kresd service
+  systemd:
+    name: kresd@1
+    state: started
+    enabled: yes
