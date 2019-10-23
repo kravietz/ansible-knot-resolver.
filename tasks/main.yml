@@ -1,14 +1,4 @@
 ---
-- name: knot-resolver group
-  group:
-    name: "{{ knot_resolver_group }}"
-- name: knot-resolver user
-  user:
-    name: "{{ knot_resolver_user }}"
-    group: "{{ knot_resolver_group }}"
-    home: /var/cache/knot-resolver
-    password_lock: yes
-
 - name: AppArmor profile
   template:
     src: templates/apparmor.conf.j2
