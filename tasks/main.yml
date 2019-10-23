@@ -24,6 +24,7 @@
 - name: supporting lua libraries
   apt:
     name: '{{ item }}'
+    update_cache: yes # required to fech the Know packages
   loop: ['lua-basexx', 'lua-cqueues', 'lua-psl']
 
 - name: install knot-resolver package
